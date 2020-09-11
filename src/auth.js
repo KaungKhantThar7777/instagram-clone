@@ -55,8 +55,24 @@ function AuthProvider({ children }) {
     });
   }, []);
 
-  async function signInWithGoogle() {
-    await firebase.auth().signInWithPopup(provider);
+  async function loginWithGoogle() {
+    const data = await firebase.auth().signInWithPopup(provider);
+
+    if (data.additionalUserInfo.isNewUser) {
+      const { name, email, picture } = data.additionalUserInfo.profile;
+      const variables = {
+        userId: data.user.uid,
+        name: name,
+        username: name.replace(/\s+/g, ""),
+        email: email,
+        website: "",
+        bio: "",
+        phoneNumber: "",
+        profileImage: picture,
+      };
+
+      await createUser({ variables });
+    }
   }
 
   async function signUpWithEmailAndPassword(formData) {
@@ -80,6 +96,13 @@ function AuthProvider({ children }) {
     }
   }
 
+  async function signInWithEmailAndPassword(email, password) {
+    const res = await firebase
+      .auth()
+      .signInWithEmailAndPassword(email, password);
+    console.log(res);
+  }
+
   async function signOut() {
     setAuthState({ status: "loading" });
     await firebase.auth().signOut();
@@ -93,9 +116,10 @@ function AuthProvider({ children }) {
       <AuthContext.Provider
         value={{
           authState,
-          signInWithGoogle,
+          loginWithGoogle,
           signOut,
           signUpWithEmailAndPassword,
+          signInWithEmailAndPassword,
         }}
       >
         {children}

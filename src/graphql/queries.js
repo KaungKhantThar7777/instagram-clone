@@ -7,3 +7,15 @@ export const FIND_USERS = gql`
     }
   }
 `;
+
+export const GET_USER_EMAIL = gql`
+  query getUserEmail($input: String!) {
+    users(
+      where: {
+        _or: [{ username: { _eq: $input } }, { phone_number: { _eq: $input } }]
+      }
+    ) {
+      email
+    }
+  }
+`;
