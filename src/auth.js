@@ -57,7 +57,6 @@ function AuthProvider({ children }) {
 
   async function loginWithGoogle() {
     const data = await firebase.auth().signInWithPopup(provider);
-
     if (data.additionalUserInfo.isNewUser) {
       const { name, email, picture } = data.additionalUserInfo.profile;
       const variables = {
@@ -80,7 +79,6 @@ function AuthProvider({ children }) {
       .auth()
       .createUserWithEmailAndPassword(formData.email, formData.password);
     if (data.additionalUserInfo.isNewUser) {
-      console.log(data);
       const variables = {
         userId: data.user.uid,
         name: formData.name,
@@ -97,12 +95,12 @@ function AuthProvider({ children }) {
   }
 
   async function signInWithEmailAndPassword(email, password) {
-    const res = await firebase
-      .auth()
-      .signInWithEmailAndPassword(email, password);
-    console.log(res);
+    await firebase.auth().signInWithEmailAndPassword(email, password);
   }
 
+  async function updateEmail(email) {
+    await authState.user.updateEmail(email);
+  }
   async function signOut() {
     setAuthState({ status: "loading" });
     await firebase.auth().signOut();
@@ -120,6 +118,7 @@ function AuthProvider({ children }) {
           signOut,
           signUpWithEmailAndPassword,
           signInWithEmailAndPassword,
+          updateEmail,
         }}
       >
         {children}

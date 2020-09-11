@@ -19,3 +19,18 @@ export const GET_USER_EMAIL = gql`
     }
   }
 `;
+
+export const GET_USER = gql`
+  query MyQuery($id: uuid!) {
+    users_by_pk(id: $id) {
+      id
+      bio
+      email
+      phone_number
+      profile_image
+      name
+      website
+      username
+    }
+  }
+`;

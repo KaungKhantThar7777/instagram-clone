@@ -112,11 +112,9 @@ function LikeButton() {
   const className = liked ? classes.liked : classes.like;
 
   function handleLike() {
-    console.log("like");
     setLiked(true);
   }
   function handleUnlike() {
-    console.log("unlike");
     setLiked(false);
   }
   const onClick = liked ? handleUnlike : handleLike;
@@ -129,11 +127,9 @@ function SaveButton() {
   const Icon = save ? RemoveIcon : SaveIcon;
 
   function handleSave() {
-    console.log("save");
     setSave(true);
   }
   function handleUnsave() {
-    console.log("unlike");
     setSave(false);
   }
   const onClick = save ? handleUnsave : handleSave;

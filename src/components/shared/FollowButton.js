@@ -5,7 +5,6 @@ import { Button } from "@material-ui/core";
 function FollowButton({ side }) {
   const classes = useFollowButtonStyles({ side });
   const [isFollowing, setIsFollowing] = useState(false);
-  console.log(side);
   const followBtn = (
     <Button
       variant={side ? "text" : "contained"}
