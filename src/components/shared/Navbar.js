@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import { useNavbarStyles, WhiteTooltip, RedTooltip } from "../../styles";
 import {
   AppBar,
@@ -29,6 +29,7 @@ import { useNProgress } from "@tanem/react-nprogress";
 import { useLazyQuery } from "@apollo/react-hooks";
 import { SEARCH_USERS } from "../../graphql/queries";
 import { UserContext } from "../../App";
+import AddPostDialog from "../post/AddPostDialog";
 
 function Navbar({ minimalNavbar }) {
   const [loading, setLoading] = useState(true);
@@ -147,6 +148,9 @@ function Links({ path }) {
   const [showList, setShowList] = useState(false);
   const [showTooltip, setShowTooltip] = useState(true);
   const { me } = useContext(UserContext);
+  const [media, setMedia] = useState(null);
+  const [showAddPostDialog, setShowAddPostDialog] = useState(false);
+  const inputRef = useRef();
 
   useEffect(() => {
     const timeout = setTimeout(() => setShowTooltip(false), 5000);
@@ -159,12 +163,30 @@ function Links({ path }) {
 
   const handleCloseList = () => setShowList(false);
 
+  const openFileInput = () => inputRef.current.click();
+
+  const handleImageChange = (e) => {
+    setMedia(e.target.files[0]);
+    setShowAddPostDialog(true);
+  };
+
+  const handleClose = () => setShowAddPostDialog(false);
   return (
     <div className={classes.linksContainer}>
       {showList && <NotificationList handleCloseList={handleCloseList} />}
       <div className={classes.linksWrapper}>
+        {showAddPostDialog && (
+          <AddPostDialog media={media} handleClose={handleClose} />
+        )}
         <Hidden xsDown>
-          <AddIcon />
+          <input
+            style={{ display: "none" }}
+            type="file"
+            accept="image/*"
+            ref={inputRef}
+            onChange={handleImageChange}
+          />
+          <AddIcon onClick={openFileInput} />
         </Hidden>
         <Link to="/">{path === "/" ? <HomeActiveIcon /> : <HomeIcon />}</Link>
         <Link to="/explore">

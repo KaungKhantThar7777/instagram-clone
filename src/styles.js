@@ -1727,3 +1727,55 @@ export const useMorePostsFromUserStyles = makeStyles((theme) => ({
     },
   },
 }));
+
+
+
+//Add post Dialog Styles
+export const useAddPostDialogStyles = makeStyles((theme) => ({
+  appBar: {
+    background: "#fff",
+    position: "relative",
+    color: "black",
+
+    height: "54px",
+  },
+  toolbar: {
+    display: "flex",
+    justifyContent: "space-between",
+    minHeight: "54px",
+  },
+  title: {
+    flex: 1,
+    fontWeight: 600,
+  },
+  paper: {
+    display: "flex",
+    alignItems: "flex-start",
+    "& > *": {
+      margin: theme.spacing(1),
+    },
+  },
+  editor: {
+    flex: 1,
+  },
+  avatarLarge: {
+    width: theme.spacing(7),
+    height: theme.spacing(7),
+  },
+  root: {
+    border: "1px solid #e6e6e6",
+    marginTop: "10px !important",
+    height: "50px",
+  },
+  underline: {
+    "&::before": {
+      border: "none !important",
+    },
+    "&::after": {
+      border: "none !important",
+    },
+    "&:hover&:before": {
+      border: "none !important",
+    },
+  },
+}));
