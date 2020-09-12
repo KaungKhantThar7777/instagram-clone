@@ -727,7 +727,8 @@ export const usePostStyles = makeStyles((theme) => ({
   },
   postContainer: {
     background: "#fff",
-    width: "100%",
+    width: "90%",
+    margin: "auto",
     [theme.breakpoints.only("xs")]: {
       marginTop: "-35px !important",
     },
@@ -804,9 +805,9 @@ export const usePostStyles = makeStyles((theme) => ({
   },
   postCaption: {
     overflowY: "scroll",
-    paddingLeft: "24px",
     paddingRight: "24px",
     paddingTop: "5px",
+    width: "100%",
   },
 }));
 
@@ -1170,6 +1171,7 @@ export const usePostSkeletonStyles = makeStyles((theme) => ({
     marginRight: "-1px",
     display: "grid",
     width: "100%",
+    height: "80vh",
     gridTemplateColumns: "calc(100vw - 335px) 335px",
     [theme.breakpoints.only("xs")]: {
       gridTemplateColumns: "100vw",
@@ -1702,7 +1704,8 @@ export const useMorePostsFromUserStyles = makeStyles((theme) => ({
   article: {
     display: "grid",
     gridTemplateColumns: "minmax(auto, 935px)",
-    width: "100vw",
+    width: "85%",
+    margin: "auto",
   },
   postContainer: {
     [theme.breakpoints.down("sm")]: {
@@ -1714,8 +1717,8 @@ export const useMorePostsFromUserStyles = makeStyles((theme) => ({
   },
   typography: {
     fontWeight: "bold !important",
-    marginBottom: `${theme.spacing(2)} !important`,
-    marginLeft: `${theme.spacing(1)} !important`,
+    marginBottom: `${theme.spacing(3)}px !important`,
+    marginLeft: `${theme.spacing(6)}px !important`,
   },
   container: {
     paddingTop: "6vh",
@@ -1748,7 +1751,7 @@ export const useAddPostDialogStyles = makeStyles((theme) => ({
   paper: {
     display: "flex",
     alignItems: "flex-start",
-    marginTop: theme.spacing(6),
+    marginTop: theme.spacing(8),
     "& > *": {
       margin: theme.spacing(1),
     },
