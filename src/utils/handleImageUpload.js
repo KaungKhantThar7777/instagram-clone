@@ -12,7 +12,8 @@ async function handleImageUpload(image) {
     }
   );
   const jsonRes = await res.json();
-  return jsonRes.url;
+  console.log(jsonRes);
+  return jsonRes.secure_url;
 }
 
 export default handleImageUpload;
