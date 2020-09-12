@@ -1748,7 +1748,7 @@ export const useAddPostDialogStyles = makeStyles((theme) => ({
   paper: {
     display: "flex",
     alignItems: "flex-start",
-    height: "60px !important",
+    marginTop: theme.spacing(6),
     "& > *": {
       margin: theme.spacing(1),
     },
