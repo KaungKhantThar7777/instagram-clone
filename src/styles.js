@@ -1734,12 +1734,12 @@ export const useAddPostDialogStyles = makeStyles((theme) => ({
     background: "#fff !important",
     position: "relative",
     color: "black !important",
-    height: "54px",
+    height: "54px !important",
   },
   toolbar: {
     display: "flex",
     justifyContent: "space-between",
-    minHeight: "54px",
+    minHeight: "54px !important",
   },
   title: {
     flex: 1,
@@ -1758,6 +1758,10 @@ export const useAddPostDialogStyles = makeStyles((theme) => ({
   avatarLarge: {
     width: theme.spacing(7),
     height: theme.spacing(7),
+  },
+  input: {
+    padding: "10px !important",
+    fontSize: "14px !important",
   },
   root: {
     border: "1px solid #e6e6e6 !important",
