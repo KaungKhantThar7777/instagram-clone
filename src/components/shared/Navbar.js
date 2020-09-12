@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useNavbarStyles, WhiteTooltip, RedTooltip } from "../../styles";
 import {
   AppBar,
@@ -22,11 +22,13 @@ import {
   LikeIcon,
   LikeActiveIcon,
 } from "../../icons";
-import { defaultCurrentUser, getDefaultUser } from "../../data";
 import { useEffect } from "react";
 import NotificationTooltip from "../notification/NotificationTooltip";
 import NotificationList from "../notification/NotificationList";
 import { useNProgress } from "@tanem/react-nprogress";
+import { useLazyQuery } from "@apollo/react-hooks";
+import { SEARCH_USERS } from "../../graphql/queries";
+import { UserContext } from "../../App";
 
 function Navbar({ minimalNavbar }) {
   const [loading, setLoading] = useState(true);
@@ -72,13 +74,20 @@ function Search({ history }) {
   const classes = useNavbarStyles();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
-  const [loading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const hasResults = Boolean(query) && results.length > 0;
-
+  const [searchUsers, { data }] = useLazyQuery(SEARCH_USERS);
   useEffect(() => {
     if (!query.trim()) return;
-    setResults(Array.from({ length: 5 }, () => getDefaultUser()));
-  }, [query]);
+    setLoading(true);
+    const variables = { query: `%${query}%` };
+    searchUsers({ variables });
+    if (data) {
+      setResults(data.users);
+      setLoading(false);
+    }
+    // setResults(Array.from({ length: 5 }, () => getDefaultUser()));
+  }, [query, data, searchUsers]);
 
   const handleClear = () => setQuery("");
   return (
@@ -137,6 +146,7 @@ function Links({ path }) {
   const classes = useNavbarStyles();
   const [showList, setShowList] = useState(false);
   const [showTooltip, setShowTooltip] = useState(true);
+  const { me } = useContext(UserContext);
 
   useEffect(() => {
     const timeout = setTimeout(() => setShowTooltip(false), 5000);
@@ -172,18 +182,11 @@ function Links({ path }) {
             {showList ? <LikeActiveIcon /> : <LikeIcon />}
           </div>
         </RedTooltip>
-        <Link to={`/${defaultCurrentUser.username}`}>
+        <Link to={`/${me.username}`}>
           <div
-            className={
-              path === `/${defaultCurrentUser.username}`
-                ? classes.profileActive
-                : ""
-            }
+            className={path === `/${me.username}` ? classes.profileActive : ""}
           ></div>
-          <Avatar
-            src={defaultCurrentUser.profile_image}
-            className={classes.profileImage}
-          />
+          <Avatar src={me.profile_image} className={classes.profileImage} />
         </Link>
       </div>
     </div>

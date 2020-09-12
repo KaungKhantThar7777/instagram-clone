@@ -19,19 +19,20 @@ import ProfilePicture from "../components/shared/ProfilePicture";
 // import { defaultCurrentUser } from "../data";
 import { UserContext } from "../App";
 import { useQuery, useMutation } from "@apollo/react-hooks";
-import { GET_USER } from "../graphql/queries";
+import { GET_USER_BY_PK } from "../graphql/queries";
 import LoadingScreen from "../components/shared/LoadingScreen";
 import { useForm } from "react-hook-form";
 import isURL from "validator/lib/isURL";
 import isEmail from "validator/lib/isEmail";
 import isMobilePhone from "validator/lib/isMobilePhone";
-import { UPDATE_USER } from "../graphql/mutations";
+import { UPDATE_AVATAR, UPDATE_USER } from "../graphql/mutations";
 import { AuthContext } from "../auth";
+import handleImageUpload from "../utils/handleImageUpload";
 
 function EditProfilePage({ history }) {
   const { currentId } = React.useContext(UserContext);
   const variables = { id: currentId };
-  const { data, loading } = useQuery(GET_USER, { variables });
+  const { data, loading } = useQuery(GET_USER_BY_PK, { variables });
   const classes = useEditProfilePageStyles();
   const [showDrawer, setShowDrawer] = useState(false);
   const path = history.location.pathname;
@@ -148,6 +149,8 @@ function EditUserInfo({ user }) {
   const [open, setOpen] = useState(false);
   const { updateEmail } = useContext(AuthContext);
   const [error, setError] = useState(DEFAULT_ERROR);
+  const [avatar, setAvatar] = useState(user.profile_image);
+  const [updateAvatar] = useMutation(UPDATE_AVATAR);
 
   const setClose = () => setOpen(false);
 
@@ -171,21 +174,37 @@ function EditUserInfo({ user }) {
       setError({ type: "email", message: error.message });
     }
   }
+
+  async function handleChangeImg(e) {
+    const url = await handleImageUpload(e.target.files[0]);
+    setAvatar(url);
+    const variables = { id: user.id, profileImage: url };
+    await updateAvatar({ variables });
+  }
   return (
     <section className={classes.container}>
       <div className={classes.pictureSectionItem}>
-        <ProfilePicture size={38} image={user.profile_image} />
+        <ProfilePicture size={38} image={avatar} />
         <div className={classes.justifySelfStart}>
           <Typography className={classes.typography}>
             {user.username}
           </Typography>
-          <Typography
-            color="primary"
-            variant="body2"
-            className={classes.typographyChangePic}
-          >
-            Change Profile Photo
-          </Typography>
+          <input
+            style={{ display: "none" }}
+            type="file"
+            accept="image/*"
+            id="image"
+            onChange={handleChangeImg}
+          />
+          <label htmlFor="image">
+            <Typography
+              color="primary"
+              variant="body2"
+              className={classes.typographyChangePic}
+            >
+              Change Profile Photo
+            </Typography>
+          </label>
         </div>
       </div>
       <form className={classes.form} onSubmit={handleSubmit(onSubmit)}>
@@ -292,6 +311,7 @@ function EditUserInfo({ user }) {
       </form>
       <Snackbar
         open={open}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
         TransitionComponent={Slide}
         autoHideDuration={5000}
         onClose={() => setClose()}

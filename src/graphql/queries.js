@@ -20,7 +20,7 @@ export const GET_USER_EMAIL = gql`
   }
 `;
 
-export const GET_USER = gql`
+export const GET_USER_BY_PK = gql`
   query MyQuery($id: uuid!) {
     users_by_pk(id: $id) {
       id
@@ -31,6 +31,36 @@ export const GET_USER = gql`
       name
       website
       username
+    }
+  }
+`;
+
+export const GET_USER_BY_USERNAME = gql`
+  query MyQuery($username: String!) {
+    users(where: { username: { _eq: $username } }) {
+      id
+      bio
+      email
+      phone_number
+      profile_image
+      name
+      website
+      username
+    }
+  }
+`;
+
+export const SEARCH_USERS = gql`
+  query searchUsers($query: String!) {
+    users(
+      where: {
+        _or: [{ username: { _ilike: $query } }, { name: { _ilike: $query } }]
+      }
+    ) {
+      username
+      profile_image
+      name
+      id
     }
   }
 `;
