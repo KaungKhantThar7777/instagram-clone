@@ -1728,15 +1728,12 @@ export const useMorePostsFromUserStyles = makeStyles((theme) => ({
   },
 }));
 
-
-
 //Add post Dialog Styles
 export const useAddPostDialogStyles = makeStyles((theme) => ({
   appBar: {
-    background: "#fff",
+    background: "#fff !important",
     position: "relative",
-    color: "black",
-
+    color: "black !important",
     height: "54px",
   },
   toolbar: {
@@ -1763,7 +1760,7 @@ export const useAddPostDialogStyles = makeStyles((theme) => ({
     height: theme.spacing(7),
   },
   root: {
-    border: "1px solid #e6e6e6",
+    border: "1px solid #e6e6e6 !important",
     marginTop: "10px !important",
     height: "50px",
   },
