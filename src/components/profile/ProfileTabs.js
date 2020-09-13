@@ -64,7 +64,7 @@ function ProfileTabs({ user, isOwner }) {
       </Hidden>
       <Hidden smUp>{user.posts.length === 0 && <Divider />}</Hidden>
       {value === 0 && <ProfilePosts isOwner={isOwner} user={user} />}
-      {value === 1 && <SavePosts />}
+      {value === 1 && isOwner && <SavePosts user={user} />}
     </section>
   );
 }
@@ -96,19 +96,32 @@ function ProfilePosts({ isOwner, user }) {
   );
 }
 
-function SavePosts() {
+function SavePosts({ user }) {
+  console.log({ user });
   const classes = useProfileTabsStyles();
+
+  if (user.save_posts.length === 0)
+    return (
+      <section className={classes.savedPostsSection}>
+        <div className={classes.noContent}>
+          <div className={classes.savePhotoIcon} />
+          <Typography variant="h4">Save</Typography>
+          <Typography align="center">
+            Save photos and videos that you want to see again.No one is
+            notified, and only you can see what you've saved.
+          </Typography>
+        </div>
+      </section>
+    );
+  console.log(user.save_posts[0].post);
   return (
-    <section className={classes.savedPostsSection}>
-      <div className={classes.noContent}>
-        <div className={classes.savePhotoIcon} />
-        <Typography variant="h4">Save</Typography>
-        <Typography align="center">
-          Save photos and videos that you want to see again.No one is notified,
-          and only you can see what you've saved.
-        </Typography>
+    <article className={classes.article}>
+      <div className={classes.postContainer}>
+        {user.save_posts.map(({ post }) => (
+          <GridPost key={post.id} post={post} />
+        ))}
       </div>
-    </section>
+    </article>
   );
 }
 

@@ -311,7 +311,6 @@ function EditUserInfo({ user }) {
       </form>
       <Snackbar
         open={open}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
         TransitionComponent={Slide}
         autoHideDuration={5000}
         onClose={() => setClose()}

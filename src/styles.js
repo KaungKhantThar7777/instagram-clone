@@ -727,8 +727,10 @@ export const usePostStyles = makeStyles((theme) => ({
   },
   postContainer: {
     background: "#fff",
-    width: "90%",
     margin: "auto",
+    height: "80%",
+    width: "100%",
+    maxWidth: "1200px",
     [theme.breakpoints.only("xs")]: {
       marginTop: "-35px !important",
     },
@@ -741,6 +743,7 @@ export const usePostStyles = makeStyles((theme) => ({
     position: "relative",
     flexDirection: "column",
     width: "100%",
+    height: "800px",
   },
   postHeader: {
     borderLeft: "1px solid rgba(var(--ce3,239,239,239),1)",
@@ -764,6 +767,7 @@ export const usePostStyles = makeStyles((theme) => ({
   postImage: {
     display: "flex",
     width: "calc(100% - 335px)",
+    height: "100%",
     [theme.breakpoints.only("xs")]: {
       width: "initial !important",
       position: "relative !important",

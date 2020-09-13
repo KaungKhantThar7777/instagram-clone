@@ -150,7 +150,6 @@ function Links({ path }) {
   const newNotifications = me.notifications.filter(({ created_at }) =>
     isAfter(new Date(created_at), new Date(me.last_checked))
   );
-  console.log(newNotifications);
   const hasNotifications = newNotifications.length > 0;
   const [media, setMedia] = useState(null);
   const [showList, setShowList] = useState(false);

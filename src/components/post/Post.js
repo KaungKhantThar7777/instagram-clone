@@ -38,9 +38,12 @@ function Post({ postId }) {
   const classes = usePostStyles();
   const [showModel, setShowModel] = React.useState(false);
   const variables = { postId };
-  const { data, loading } = useSubscription(GET_POST, { variables });
-  if (loading) return <PostSkeleton />;
+  console.log({ postId });
+  const res = useSubscription(GET_POST, { variables });
 
+  const { data, loading, error } = res;
+  console.log({ data, loading, error });
+  if (loading) return <PostSkeleton />;
   const {
     media,
     id,
