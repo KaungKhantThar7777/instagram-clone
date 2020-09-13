@@ -1,24 +1,34 @@
 import React from "react";
 import { useNotificationListStyles } from "../../styles";
-import { defaultNotifications } from "../../data";
+// import { defaultNotifications } from "../../data";
 import { Avatar, Typography, Grid } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import FollowButton from "../shared/FollowButton";
 import useOutsideClick from "@rooks/use-outside-click";
+import { useMutation } from "@apollo/react-hooks";
+import { CHECK_NOTIFICATIONS } from "../../graphql/mutations";
+import { formatDateToNowShort } from "../../utils/formatDate";
 
-function NotificationList({ handleCloseList }) {
+function NotificationList({ handleCloseList, notifications, currentId }) {
   const listContainerRef = React.useRef();
   const classes = useNotificationListStyles();
-
+  const [checkNotifications] = useMutation(CHECK_NOTIFICATIONS);
   useOutsideClick(listContainerRef, handleCloseList);
 
+  React.useEffect(() => {
+    const variables = {
+      userId: currentId,
+      lastChecked: new Date().toISOString(),
+    };
+    checkNotifications({ variables });
+  }, [checkNotifications, currentId]);
   return (
     <Grid ref={listContainerRef} className={classes.listContainer} container>
-      {defaultNotifications.map((notification) => {
+      {notifications.map((notification) => {
         const isLike = notification.type === "like";
         const isFollow = notification.type === "follow";
         return (
-          <Grid className={classes.listItem} item>
+          <Grid key={notification.id} className={classes.listItem} item>
             <div className={classes.listItemWrapper}>
               <div className={classes.avatarWrapper}>
                 <Avatar
@@ -35,8 +45,14 @@ function NotificationList({ handleCloseList }) {
                   color="textSecondary"
                   className={classes.typography}
                 >
-                  {isLike && "likes your photo. 4d"}
-                  {isFollow && "started following you. 5d"}
+                  {isLike &&
+                    `likes your photo. ${formatDateToNowShort(
+                      notification.created_at
+                    )}`}
+                  {isFollow &&
+                    `started following you. ${formatDateToNowShort(
+                      notification.created_at
+                    )}`}
                 </Typography>
               </div>
             </div>

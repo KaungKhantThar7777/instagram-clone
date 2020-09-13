@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import Moment from "react-moment";
 import { usePostStyles } from "../../styles";
 import {
   MoreIcon,
@@ -33,6 +32,7 @@ import {
   SAVE_POST,
   CREATE_COMMENT,
 } from "../../graphql/mutations";
+import { formatDateToNowShort, formatPostDate } from "../../utils/formatDate";
 
 function Post({ postId }) {
   const classes = usePostStyles();
@@ -54,7 +54,6 @@ function Post({ postId }) {
     location,
   } = data.posts_by_pk;
 
-  console.log(save_posts);
   const likesCount = likes_aggregate.aggregate.count;
 
   return (
@@ -103,7 +102,7 @@ function Post({ postId }) {
             className={classes.datePosted}
             component="span"
           >
-            5 DAYS AGO
+            {formatPostDate.created_at}
             <Hidden xsDown>
               <div className={classes.comment}>
                 <Divider />
@@ -132,7 +131,7 @@ function AuthorCaption({ user, caption, createdAt }) {
         <Link to={`/${user.username}`}>
           <Typography
             variant="subtitle2"
-            component="p"
+            component="span"
             className={classes.username}
           >
             {user.username}
@@ -143,10 +142,10 @@ function AuthorCaption({ user, caption, createdAt }) {
             className={classes.postCaption}
             dangerouslySetInnerHTML={{ __html: caption }}
           />
+          <Typography variant="caption" color="textSecondary">
+            {formatDateToNowShort(createdAt)}
+          </Typography>
         </Link>
-        <Typography variant="caption" color="textSecondary">
-          <Moment format="DD/MM/YYYY">{createdAt}</Moment>
-        </Typography>
       </div>
     </div>
   );
@@ -165,21 +164,21 @@ function UserComment({ comment }) {
         <Link to={`/${comment.user.username}`}>
           <Typography
             variant="subtitle2"
-            component="p"
+            component="span"
             className={classes.username}
           >
             {comment.user.username}
           </Typography>
           <Typography
             variant="body2"
-            component="span2"
+            component="span"
             className={classes.postCaption}
           >
             {comment.content}
           </Typography>
         </Link>
         <Typography variant="caption" color="textSecondary">
-          <Moment format="DD/MM/YYYY">{comment.createdAt}</Moment>
+          {formatDateToNowShort(comment.created_at)}
         </Typography>
       </div>
     </div>
@@ -199,7 +198,7 @@ function LikeButton({ likes, authorId, postId }) {
   const variables = {
     userId: currentId,
     postId,
-    // profileId:authorId for notifications
+    profileId: authorId,
   };
   function handleLike() {
     setLiked(true);
@@ -243,14 +242,15 @@ function Comment({ postId }) {
   const [content, setContent] = useState("");
   const [createComment] = useMutation(CREATE_COMMENT);
   const { currentId } = React.useContext(UserContext);
-  const variables = {
-    userId: currentId,
-    postId,
-    content,
-  };
 
   const handleAddComment = () => {
+    const variables = {
+      userId: currentId,
+      postId,
+      content,
+    };
     createComment({ variables });
+    setContent("");
   };
   return (
     <div className={classes.commentContainer}>

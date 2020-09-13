@@ -86,17 +86,37 @@ export const CREATE_POST = gql`
 `;
 
 export const LIKE_POST = gql`
-  mutation likePost($postId: uuid!, $userId: uuid!) {
+  mutation likePost($postId: uuid!, $userId: uuid!, $profileId: uuid!) {
     insert_likes(objects: { post_id: $postId, user_id: $userId }) {
+      affected_rows
+    }
+    insert_notifications(
+      objects: {
+        post_id: $postId
+        profile_id: $profileId
+        user_id: $userId
+        type: "like"
+      }
+    ) {
       affected_rows
     }
   }
 `;
 
 export const UNLIKE_POST = gql`
-  mutation unlikePost($postId: uuid!, $userId: uuid!) {
+  mutation unlikePost($postId: uuid!, $userId: uuid!, $profileId: uuid!) {
     delete_likes(
       where: { post_id: { _eq: $postId }, user_id: { _eq: $userId } }
+    ) {
+      affected_rows
+    }
+    delete_notifications(
+      where: {
+        post_id: { _eq: $postId }
+        profile_id: { _eq: $profileId }
+        user_id: { _eq: $userId }
+        type: { _eq: "like" }
+      }
     ) {
       affected_rows
     }
@@ -127,6 +147,17 @@ export const CREATE_COMMENT = gql`
       objects: { content: $content, post_id: $postId, user_id: $userId }
     ) {
       affected_rows
+    }
+  }
+`;
+
+export const CHECK_NOTIFICATIONS = gql`
+  mutation checkNotifications($userId: uuid!, $lastChecked: String!) {
+    update_users_by_pk(
+      pk_columns: { id: $userId }
+      _set: { last_checked: $lastChecked }
+    ) {
+      last_checked
     }
   }
 `;
