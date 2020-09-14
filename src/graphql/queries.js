@@ -79,7 +79,7 @@ export const GET_USER_PROFILE = gql`
           count
         }
       }
-      posts {
+      posts(order_by: { created_at: desc }) {
         id
         media
         comments_aggregate {
@@ -103,7 +103,7 @@ export const GET_USER_PROFILE = gql`
           count
         }
       }
-      save_posts {
+      save_posts(order_by: { created_at: desc }) {
         post {
           id
           media
@@ -118,6 +118,89 @@ export const GET_USER_PROFILE = gql`
             }
           }
         }
+      }
+    }
+  }
+`;
+
+export const SUGGEST_USER = gql`
+  query suggestUser(
+    $limit: Int!
+    $followerIds: [uuid!]!
+    $createdAt: timestamptz!
+  ) {
+    users(
+      limit: $limit
+      where: {
+        _or: [
+          { id: { _in: $followerIds } }
+          { created_at: { _gt: $createdAt } }
+        ]
+      }
+    ) {
+      id
+      username
+      name
+      profile_image
+    }
+  }
+`;
+
+export const EXPLORE_POSTS = gql`
+  query explorePost($followingIds: [uuid!]!) {
+    posts(
+      order_by: {
+        created_at: desc
+        likes_aggregate: { count: desc }
+        comments_aggregate: { count: desc }
+      }
+      where: { id: { _nin: $followingIds } }
+    ) {
+      id
+      media
+      comments_aggregate {
+        aggregate {
+          count
+        }
+      }
+      likes_aggregate {
+        aggregate {
+          count
+        }
+      }
+    }
+  }
+`;
+
+export const MORE_POST_FROM_USER = gql`
+  query morePostFromUser($userId: uuid!, $postId: uuid!) {
+    posts(
+      where: { user_id: { _eq: $userId }, id: { _neq: $postId } }
+      limit: 6
+    ) {
+      id
+      media
+      comments_aggregate {
+        aggregate {
+          count
+        }
+      }
+      likes_aggregate {
+        aggregate {
+          count
+        }
+      }
+    }
+  }
+`;
+
+export const GET_POST = gql`
+  query getPost($postId: uuid!) {
+    posts_by_pk(id: $postId) {
+      id
+      user {
+        id
+        username
       }
     }
   }

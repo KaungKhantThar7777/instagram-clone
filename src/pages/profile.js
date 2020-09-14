@@ -14,11 +14,11 @@ import {
   Avatar,
 } from "@material-ui/core";
 import ProfilePicture from "../components/shared/ProfilePicture";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useHistory } from "react-router-dom";
 import { GearIcon } from "../icons";
 import ProfileTabs from "../components/profile/ProfileTabs";
 import { AuthContext } from "../auth";
-import { useMutation, useQuery } from "@apollo/react-hooks";
+import { useApolloClient, useMutation, useQuery } from "@apollo/react-hooks";
 import { GET_USER_PROFILE } from "../graphql/queries";
 import LoadingScreen from "../components/shared/LoadingScreen";
 import { UserContext } from "../App";
@@ -30,7 +30,10 @@ function ProfilePage() {
   const { currentId } = React.useContext(UserContext);
   const variables = { username };
   const [showOptionsMenu, setShowOptionsMenu] = React.useState(false);
-  const { data, loading } = useQuery(GET_USER_PROFILE, { variables });
+  const { data, loading } = useQuery(GET_USER_PROFILE, {
+    variables,
+    fetchPolicy: "no-cache",
+  });
   if (loading) return <LoadingScreen />;
 
   const [user] = data.users;
@@ -281,10 +284,17 @@ function OptionsMenu({ handleClick }) {
   const classes = useProfilePageStyles();
   const [showLogoutMenu, setShowOptionsMenu] = useState(false);
   const { signOut } = useContext(AuthContext);
-  const handleShowLogoutMenu = () => {
+  const history = useHistory();
+  const client = useApolloClient();
+
+  const handleShowLogoutMenu = async () => {
     setShowOptionsMenu(true);
-    setTimeout(() => {
+
+    setTimeout(async () => {
+      await client.clearStore();
       signOut();
+      history.push("/accounts/login");
+      window.location.reload();
     }, 2000);
   };
   return (

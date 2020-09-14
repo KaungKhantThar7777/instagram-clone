@@ -5,12 +5,20 @@ import { LoadingLargeIcon } from "../../icons";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { getDefaultUser } from "../../data";
+// import { getDefaultUser } from "../../data";
 import FollowButton from "./FollowButton";
-function FollowSuggestions({ hiddenHeader, slideToShow = 3 }) {
+import { useQuery } from "@apollo/react-hooks";
+import { UserContext } from "../../App";
+import { SUGGEST_USER } from "../../graphql/queries";
+function FollowSuggestions({ hiddenHeader }) {
   const classes = useFollowSuggestionsStyles();
-  let loading = false;
-
+  const { followerIds, me } = React.useContext(UserContext);
+  const variables = {
+    limit: 10,
+    followerIds,
+    createdAt: me.created_at,
+  };
+  const { data, loading } = useQuery(SUGGEST_USER, { variables });
   return (
     <div className={classes.container}>
       {!hiddenHeader && (
@@ -26,17 +34,18 @@ function FollowSuggestions({ hiddenHeader, slideToShow = 3 }) {
         <LoadingLargeIcon />
       ) : (
         <Slider
+          arrows
           className={classes.slide}
           dots={false}
           easing="ease-in-out"
           infinite
           swipeToSlide
           slidesToScroll={3}
-          slidesToShow={slideToShow}
+          variableWidth
           speed={1000}
           touchThreshold={1000}
         >
-          {Array.from({ length: 10 }, () => getDefaultUser()).map((user) => (
+          {data.users.map((user) => (
             <FollowSuggestionItem key={user.id} user={user} />
           ))}
         </Slider>
@@ -47,7 +56,7 @@ function FollowSuggestions({ hiddenHeader, slideToShow = 3 }) {
 
 function FollowSuggestionItem({ user }) {
   const classes = useFollowSuggestionsStyles();
-  const { profile_image, username } = user;
+  const { profile_image, username, name, id } = user;
 
   return (
     <div>
@@ -74,9 +83,9 @@ function FollowSuggestionItem({ user }) {
           className={classes.text}
           align="center"
         >
-          Follows you
+          {name}
         </Typography>
-        <FollowButton side={false} />
+        <FollowButton side={false} id={id} />
       </div>
     </div>
   );

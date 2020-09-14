@@ -872,7 +872,7 @@ export const useFollowSuggestionsStyles = makeStyles((theme) => ({
     "& .slick-slide > div": {
       background: "#fdfdfd",
       border,
-      padding: "20px !important",
+      padding: "20px 33px !important",
       margin: "10px",
     },
     "& .slick-next:before, & .slick-prev:before": {

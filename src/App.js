@@ -27,7 +27,9 @@ function App() {
   const isAuth = authState.status === "in";
   const userId = isAuth ? authState.user.uid : null;
   const variables = { userId };
-  const { data, loading } = useSubscription(ME, { variables });
+  const { data, loading } = useSubscription(ME, {
+    variables,
+  });
 
   const history = useHistory();
   const location = useLocation();
@@ -56,7 +58,6 @@ function App() {
       </Switch>
     );
   }
-
   const me = data.users[0] || null;
   const currentId = me.id;
 

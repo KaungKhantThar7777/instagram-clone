@@ -18,7 +18,7 @@ function ProfilePicture({
   const { currentId } = React.useContext(UserContext);
 
   async function handleChangeImg(e) {
-    const url = await handleImageUpload(e.target.files[0]);
+    const url = await handleImageUpload(e.target.files[0], "instagram-avatar");
     setAvatar(url);
     const variables = { id: currentId, profileImage: url };
     await updateAvatar({ variables });
