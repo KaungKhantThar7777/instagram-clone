@@ -10,43 +10,45 @@ import {
   SaveIcon,
 } from "../../icons";
 import { Link } from "react-router-dom";
-import {
-  Typography,
-  Button,
-  Hidden,
-  Divider,
-  TextField,
-} from "@material-ui/core";
+import { Typography, Button, Hidden, Divider, TextField } from "@material-ui/core";
 import HTMLEllipsis from "react-lines-ellipsis/lib/html";
 import UserCard from "../shared/UserCard";
 import FollowSuggestions from "../shared/FollowSuggestions";
 import OptionsDialog from "../shared/OptionsDialog";
+import { formatDateToNow } from "../../utils/formatDate";
+import Img from "react-graceful-image";
 
 function FeedPost({ post, index }) {
   const classes = useFeedPostStyles();
-  const { media, id, likes, user, caption, comments } = post;
+
+  const {
+    media,
+    id,
+    user,
+    caption,
+    likes_aggregate,
+    comments,
+    comments_aggregate,
+    location,
+    created_at,
+  } = post;
   const [showCaption, setShowCaption] = useState(false);
   const [showModel, setShowModel] = useState(false);
-
+  const likesCount = likes_aggregate.aggregate.count;
+  const commentsCount = comments_aggregate.aggregate.count;
   const showSuggestions = index === 1;
 
   return (
     <>
-      <article
-        className={classes.article}
-        style={{ marginBottom: showSuggestions && 30 }}
-      >
+      <article className={classes.article} style={{ marginBottom: showSuggestions && 30 }}>
         {/* Post Header */}
         <div className={classes.postHeader}>
-          <UserCard user={user} />
-          <MoreIcon
-            className={classes.moreIcon}
-            onClick={() => setShowModel(true)}
-          />
+          <UserCard user={user} location={location} />
+          <MoreIcon className={classes.moreIcon} onClick={() => setShowModel(true)} />
         </div>
         {/* Post Image */}
         <div>
-          <img src={media} alt="Profile" className={classes.image} />
+          <Img src={media} alt="Profile" className={classes.image} />
         </div>
         {/* Post Buttons */}
         <div className={classes.postButtonsWrapper}>
@@ -60,15 +62,11 @@ function FeedPost({ post, index }) {
           </div>
 
           <Typography className={classes.likes}>
-            <span>{likes === 1 ? "1 Like" : `${likes} Likes`}</span>
+            <span>{likesCount === 1 ? "1 Like" : `${likesCount} Likes`}</span>
           </Typography>
           <div className={showCaption ? classes.expanded : classes.collapsed}>
             <Link to={`/${user.username}`}>
-              <Typography
-                variant="subtitle2"
-                component="span"
-                className={classes.username}
-              >
+              <Typography variant="subtitle2" component="span" className={classes.username}>
                 {user.username}
               </Typography>
             </Link>
@@ -80,38 +78,22 @@ function FeedPost({ post, index }) {
               />
             ) : (
               <div className={classes.captionWrapper}>
-                <HTMLEllipsis
-                  unsafeHTML={caption}
-                  maxLine={0}
-                  ellipsis="..."
-                  basedOn="letters"
-                />
-                <Button
-                  className={classes.moreButton}
-                  onClick={() => setShowCaption(true)}
-                >
+                <HTMLEllipsis unsafeHTML={caption} maxLine={0} ellipsis="..." basedOn="letters" />
+                <Button className={classes.moreButton} onClick={() => setShowCaption(true)}>
                   more
                 </Button>
               </div>
             )}
           </div>
           <Link to={`/p/${id}`}>
-            <Typography
-              variant="body2"
-              component="div"
-              className={classes.commentsLink}
-            >
-              View all {comments.length} comments
+            <Typography variant="body2" component="div" className={classes.commentsLink}>
+              View all {commentsCount} comments
             </Typography>
           </Link>
           {comments.map((comment) => (
             <div key={comment.id}>
               <Link to={`/${comment.user.username}`}>
-                <Typography
-                  variant="body2"
-                  component="span"
-                  className={classes.commentUsername}
-                >
+                <Typography variant="body2" component="span" className={classes.commentUsername}>
                   {comment.user.username}
                 </Typography>{" "}
                 <Typography variant="body2" component="span">
@@ -121,7 +103,7 @@ function FeedPost({ post, index }) {
             </div>
           ))}
           <Typography color="textSecondary" className={classes.datePosted}>
-            5 DAYS AGO
+            {formatDateToNow(created_at)}
           </Typography>
         </div>
 
@@ -131,7 +113,9 @@ function FeedPost({ post, index }) {
         </Hidden>
       </article>
       {showSuggestions && <FollowSuggestions />}
-      {showModel && <OptionsDialog onClose={() => setShowModel(false)} />}
+      {showModel && (
+        <OptionsDialog authorId={user.id} postId={id} onClose={() => setShowModel(false)} />
+      )}
     </>
   );
 }
@@ -187,11 +171,7 @@ function Comment() {
           },
         }}
       />
-      <Button
-        color="primary"
-        className={classes.commentButton}
-        disabled={!content.trim()}
-      >
+      <Button color="primary" className={classes.commentButton} disabled={!content.trim()}>
         Post
       </Button>
     </div>

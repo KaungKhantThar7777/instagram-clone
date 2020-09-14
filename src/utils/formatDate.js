@@ -1,10 +1,14 @@
-const { format, isThisYear, formatDistanceStrict } = require("date-fns");
+const { format, isThisYear, formatDistanceStrict, formatDistanceToNow } = require("date-fns");
 
 export function formatPostDate(date) {
   const formatShort = format(new Date(date), "MMMM d").toUpperCase();
 
   const formatLong = format(new Date(date), "MMMM d, YYYY").toUpperCase();
   return isThisYear(new Date(date)) ? formatShort : formatLong;
+}
+
+export function formatDateToNow(date) {
+  return formatDistanceToNow(new Date(date), { addSuffix: true }).toUpperCase();
 }
 
 export function formatDateToNowShort(date) {

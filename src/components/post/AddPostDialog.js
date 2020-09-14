@@ -53,6 +53,7 @@ const AddPostDialog = ({ media, handleClose }) => {
     await createPost({ variables });
     setIsSubmitting(false);
     handleClose();
+    window.location.reload();
   };
   return (
     <Dialog open fullScreen TransitionComponent={Zoom} onClose={handleClose}>
@@ -62,11 +63,7 @@ const AddPostDialog = ({ media, handleClose }) => {
           <Typography variant="body1" className={classes.title} align="center">
             New Post
           </Typography>
-          <Button
-            color="primary"
-            disabled={isSubmitting}
-            onClick={handleSharePost}
-          >
+          <Button color="primary" disabled={isSubmitting} onClick={handleSharePost}>
             Share
           </Button>
         </Toolbar>
@@ -74,21 +71,10 @@ const AddPostDialog = ({ media, handleClose }) => {
       <Divider />
       <Paper className={classes.paper}>
         <Avatar src={me.profile_image} />
-        <Slate
-          editor={editor}
-          value={value}
-          onChange={(newValue) => setValue(newValue)}
-        >
-          <Editable
-            placeholder="Write your caption..."
-            className={classes.editor}
-          />
+        <Slate editor={editor} value={value} onChange={(newValue) => setValue(newValue)}>
+          <Editable placeholder="Write your caption..." className={classes.editor} />
         </Slate>
-        <Avatar
-          src={URL.createObjectURL(media)}
-          variant="square"
-          className={classes.avatarLarge}
-        />
+        <Avatar src={URL.createObjectURL(media)} variant="square" className={classes.avatarLarge} />
       </Paper>
       <TextField
         className={classes.input}

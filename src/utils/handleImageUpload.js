@@ -1,4 +1,4 @@
-async function handleImageUpload(image) {
+async function handleImageUpload(image, uploadPreset = 'instagram') {
   const data = new FormData();
   data.append("file", image);
   data.append("upload_preset", "instagram");

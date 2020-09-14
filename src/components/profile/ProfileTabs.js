@@ -97,7 +97,6 @@ function ProfilePosts({ isOwner, user }) {
 }
 
 function SavePosts({ user }) {
-  console.log({ user });
   const classes = useProfileTabsStyles();
 
   if (user.save_posts.length === 0)
@@ -113,7 +112,7 @@ function SavePosts({ user }) {
         </div>
       </section>
     );
-  console.log(user.save_posts[0].post);
+
   return (
     <article className={classes.article}>
       <div className={classes.postContainer}>

@@ -10,14 +10,7 @@ import {
   SaveIcon,
 } from "../../icons";
 import { Link } from "react-router-dom";
-import {
-  Typography,
-  Button,
-  Hidden,
-  Divider,
-  TextField,
-  Avatar,
-} from "@material-ui/core";
+import { Typography, Button, Hidden, Divider, TextField, Avatar } from "@material-ui/core";
 import UserCard from "../shared/UserCard";
 import OptionsDialog from "../shared/OptionsDialog";
 // import { defaultPost } from "../../data";
@@ -33,6 +26,7 @@ import {
   CREATE_COMMENT,
 } from "../../graphql/mutations";
 import { formatDateToNowShort, formatPostDate } from "../../utils/formatDate";
+import Img from "react-graceful-image";
 
 function Post({ postId }) {
   const classes = usePostStyles();
@@ -42,6 +36,7 @@ function Post({ postId }) {
 
   const { data, loading } = res;
   if (loading) return <PostSkeleton />;
+  console.log({ data, loading });
   const {
     media,
     id,
@@ -63,14 +58,11 @@ function Post({ postId }) {
         {/* Post Header */}
         <div className={classes.postHeader}>
           <UserCard user={user} avatarSize={32} location={location} />
-          <MoreIcon
-            className={classes.moreIcon}
-            onClick={() => setShowModel(true)}
-          />
+          <MoreIcon className={classes.moreIcon} onClick={() => setShowModel(true)} />
         </div>
         {/* Post Image */}
         <div className={classes.postImage}>
-          <img src={media} alt="Profile" className={classes.image} />
+          <Img src={media} alt="Profile" className={classes.image} />
         </div>
         {/* Post Buttons */}
         <div className={classes.postButtonsWrapper}>
@@ -88,21 +80,13 @@ function Post({ postId }) {
           </Typography>
 
           <div style={{ overflowY: "scroll", height: "100%" }}>
-            <AuthorCaption
-              user={user}
-              createdAt={created_at}
-              caption={caption}
-            />
+            <AuthorCaption user={user} createdAt={created_at} caption={caption} />
             {comments.map((comment) => (
               <UserComment key={comment.id} comment={comment} />
             ))}
           </div>
 
-          <Typography
-            color="textSecondary"
-            className={classes.datePosted}
-            component="span"
-          >
+          <Typography color="textSecondary" className={classes.datePosted} component="span">
             {formatPostDate.created_at}
             <Hidden xsDown>
               <div className={classes.comment}>
@@ -114,7 +98,9 @@ function Post({ postId }) {
         </div>
       </article>
 
-      {showModel && <OptionsDialog onClose={() => setShowModel(false)} />}
+      {showModel && (
+        <OptionsDialog postId={id} authorId={user.id} onClose={() => setShowModel(false)} />
+      )}
     </div>
   );
 }
@@ -130,11 +116,7 @@ function AuthorCaption({ user, caption, createdAt }) {
       />
       <div style={{ display: "flex" }}>
         <Link to={`/${user.username}`}>
-          <Typography
-            variant="subtitle2"
-            component="span"
-            className={classes.username}
-          >
+          <Typography variant="subtitle2" component="span" className={classes.username}>
             {user.username}
           </Typography>
           <Typography
@@ -163,18 +145,10 @@ function UserComment({ comment }) {
       />
       <div style={{ display: "flex" }}>
         <Link to={`/${comment.user.username}`}>
-          <Typography
-            variant="subtitle2"
-            component="span"
-            className={classes.username}
-          >
+          <Typography variant="subtitle2" component="span" className={classes.username}>
             {comment.user.username}
           </Typography>
-          <Typography
-            variant="body2"
-            component="span"
-            className={classes.postCaption}
-          >
+          <Typography variant="body2" component="span" className={classes.postCaption}>
             {comment.content}
           </Typography>
         </Link>

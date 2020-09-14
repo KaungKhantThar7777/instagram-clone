@@ -1,12 +1,44 @@
 import React from "react";
 import { useOptionsDialogStyles } from "../../styles";
 import { Dialog, Zoom, Button, Divider } from "@material-ui/core";
-import { Link } from "react-router-dom";
-import { defaultPost } from "../../data";
+import { Link, useHistory } from "react-router-dom";
+// import { defaultPost } from "../../data";
+import { UserContext } from "../../App";
+import { useMutation } from "@apollo/react-hooks";
+import { DELETE_POST, UNFOLLOW_USER } from "../../graphql/mutations";
 
-function OptionsDialog({ onClose }) {
+function OptionsDialog({ onClose, postId, authorId }) {
+  const history = useHistory();
   const classes = useOptionsDialogStyles();
+  const { currentId, followingIds } = React.useContext(UserContext);
+  const [unfollowUser] = useMutation(UNFOLLOW_USER);
+  const [deletePost] = useMutation(DELETE_POST);
+  const isOwner = authorId === currentId;
+  const onClick = isOwner ? handleDeletePost : handleUnfollowUser;
 
+  function handleDeletePost() {
+    const variables = {
+      postId,
+      userId: currentId,
+    };
+    deletePost({ variables });
+    onClose();
+    history.push("/");
+    window.location.reload();
+  }
+
+  function handleUnfollowUser() {
+    const variables = {
+      userIdToFollow: authorId,
+      currentUserId: currentId,
+    };
+    unfollowUser({ variables });
+    onClose();
+  }
+
+  const buttonText = isOwner ? "Delete" : "Unfollow";
+  const isFollowing = followingIds.some((id) => id === authorId);
+  const isUnrelatedUser = !isOwner && !isFollowing;
   return (
     <Dialog
       open
@@ -14,10 +46,14 @@ function OptionsDialog({ onClose }) {
       onClose={onClose}
       TransitionComponent={Zoom}
     >
-      <Button className={classes.redButton}>Unfollow</Button>
+      {!isUnrelatedUser && (
+        <Button onClick={onClick} className={classes.redButton}>
+          {buttonText}
+        </Button>
+      )}
       <Divider />
       <Button className={classes.button}>
-        <Link to={`/p/${defaultPost.id}`}>Go to post</Link>
+        <Link to={`/p/${postId}`}>Go to post</Link>
       </Button>
       <Divider />
       <Button className={classes.button}>Share</Button>
