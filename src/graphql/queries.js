@@ -130,14 +130,14 @@ export const SUGGEST_USER = gql`
 `;
 
 export const EXPLORE_POSTS = gql`
-  query explorePost($followingIds: [uuid!]!) {
+  query explorePost($feedIds: [uuid!]!) {
     posts(
       order_by: {
         created_at: desc
         likes_aggregate: { count: desc }
         comments_aggregate: { count: desc }
       }
-      where: { id: { _nin: $followingIds } }
+      where: { user_id: { _nin: $feedIds } }
     ) {
       id
       media
@@ -224,7 +224,6 @@ export const GET_FEED = gql`
         created_at
         id
         user {
-          profile_image
           username
         }
       }

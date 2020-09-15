@@ -12,10 +12,9 @@ function ExploreGrid({ postId }) {
   const classes = useMorePostsFromUserStyles();
   const variables = { postId };
   const { data, loading } = useQuery(GET_POST, { variables });
-  const [
-    getMorePostsFromUser,
-    { data: morePosts, loading: loading2 },
-  ] = useLazyQuery(MORE_POST_FROM_USER);
+  const [getMorePostsFromUser, { data: morePosts, loading: loading2 }] = useLazyQuery(
+    MORE_POST_FROM_USER
+  );
 
   React.useEffect(() => {
     if (loading) return;
@@ -38,10 +37,7 @@ function ExploreGrid({ postId }) {
             className={classes.typography}
           >
             More Posts from{" "}
-            <Link
-              to={`/${data.posts_by_pk.user.username}`}
-              className={classes.link}
-            >
+            <Link to={`/${data.posts_by_pk.user.username}`} className={classes.link}>
               @{data.posts_by_pk.user.username}
             </Link>
           </Typography>

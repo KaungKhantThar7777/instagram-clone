@@ -10,8 +10,8 @@ import { LoadingLargeIcon } from "../../icons";
 
 function ExploreGrid() {
   const classes = useExploreGridStyles();
-  const { followingIds } = React.useContext(UserContext);
-  const variables = { followingIds };
+  const { feedIds } = React.useContext(UserContext);
+  const variables = { feedIds };
   const { data, loading } = useQuery(EXPLORE_POSTS, { variables });
   if (loading) return <LoadingLargeIcon />;
   return (

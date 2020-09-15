@@ -17,6 +17,16 @@ import FollowSuggestions from "../shared/FollowSuggestions";
 import OptionsDialog from "../shared/OptionsDialog";
 import { formatDateToNow } from "../../utils/formatDate";
 import Img from "react-graceful-image";
+import {
+  LIKE_POST,
+  UNLIKE_POST,
+  UNSAVE_POST,
+  SAVE_POST,
+  CREATE_COMMENT,
+} from "../../graphql/mutations";
+import { UserContext } from "../../App";
+import { useMutation } from "@apollo/react-hooks";
+import { GET_FEED } from "../../graphql/queries";
 
 function FeedPost({ post, index }) {
   const classes = useFeedPostStyles();
@@ -25,13 +35,16 @@ function FeedPost({ post, index }) {
     media,
     id,
     user,
+    likes,
     caption,
     likes_aggregate,
+    save_posts,
     comments,
     comments_aggregate,
     location,
     created_at,
   } = post;
+
   const [showCaption, setShowCaption] = useState(false);
   const [showModel, setShowModel] = useState(false);
   const likesCount = likes_aggregate.aggregate.count;
@@ -53,12 +66,12 @@ function FeedPost({ post, index }) {
         {/* Post Buttons */}
         <div className={classes.postButtonsWrapper}>
           <div className={classes.postButtons}>
-            <LikeButton />
+            <LikeButton likes={likes} postId={id} authorId={user.id} />
             <Link to={`/p/${id}`}>
               <CommentIcon />
             </Link>
             <ShareIcon />
-            <SaveButton />
+            <SaveButton savePosts={save_posts} postId={id} />
           </div>
 
           <Typography className={classes.likes}>
@@ -109,7 +122,7 @@ function FeedPost({ post, index }) {
 
         <Hidden xsDown>
           <Divider />
-          <Comment />
+          <Comment postId={id} />
         </Hidden>
       </article>
       {showSuggestions && <FollowSuggestions />}
@@ -119,40 +132,127 @@ function FeedPost({ post, index }) {
     </>
   );
 }
-function LikeButton() {
+function LikeButton({ likes, postId, authorId }) {
   const classes = useFeedPostStyles();
-  const [liked, setLiked] = useState(false);
+  const { currentId, feedIds } = React.useContext(UserContext);
+  const isAlreadyLiked = likes.some((like) => like.user_id === currentId);
+  const [liked, setLiked] = useState(isAlreadyLiked);
   const Icon = liked ? UnlikeIcon : LikeIcon;
   const className = liked ? classes.liked : classes.like;
+  const [likePost] = useMutation(LIKE_POST);
+  const [unlikePost] = useMutation(UNLIKE_POST);
+  const variables = {
+    postId,
+    userId: currentId,
+    profileId: authorId,
+  };
 
+  function handleUpdate(cache, result) {
+    const variables = { limit: 2, feedIds };
+    const data = cache.readQuery({
+      query: GET_FEED,
+      variables,
+    });
+    const typename = result.data.insert_likes?.__typename;
+    const count = typename === "likes_mutation_response" ? 1 : -1;
+    const posts = data.posts.map((post) => ({
+      ...post,
+      likes_aggregate: {
+        ...post.likes_aggregate,
+        aggregate: {
+          ...post.likes_aggregate.aggregate,
+          count: post.likes_aggregate.aggregate.count + count,
+        },
+      },
+    }));
+
+    cache.writeQuery({ query: GET_FEED, data: { posts } });
+  }
   function handleLike() {
     setLiked(true);
+    likePost({ variables, update: handleUpdate });
   }
   function handleUnlike() {
     setLiked(false);
+    unlikePost({ variables, update: handleUpdate });
   }
   const onClick = liked ? handleUnlike : handleLike;
   return <Icon className={className} onClick={onClick} />;
 }
 
-function SaveButton() {
+function SaveButton({ savePosts, postId }) {
   const classes = useFeedPostStyles();
-  const [save, setSave] = useState(false);
+  const { currentId } = React.useContext(UserContext);
+  const isAlreadySaved = savePosts.some((post) => post.user_id === currentId);
+  const [save, setSave] = useState(isAlreadySaved);
   const Icon = save ? RemoveIcon : SaveIcon;
+  const [savePost] = useMutation(SAVE_POST);
+  const [unsavePost] = useMutation(UNSAVE_POST);
 
+  const variables = {
+    postId,
+    userId: currentId,
+  };
   function handleSave() {
     setSave(true);
+    savePost({ variables });
   }
   function handleUnsave() {
     setSave(false);
+    unsavePost({ variables });
   }
   const onClick = save ? handleUnsave : handleSave;
   return <Icon className={classes.saveIcon} onClick={onClick} />;
 }
 
-function Comment() {
+function Comment({ postId }) {
   const classes = useFeedPostStyles();
   const [content, setContent] = useState("");
+  const { feedIds } = React.useContext(UserContext);
+  const [createComment] = useMutation(CREATE_COMMENT);
+  const { currentId } = React.useContext(UserContext);
+
+  function handleUpdate(cache, result) {
+    const variables = { limit: 2, feedIds };
+    const data = cache.readQuery({
+      query: GET_FEED,
+      variables,
+    });
+
+    const oldComment = result.data.insert_comments.returning[0];
+    const newComment = {
+      ...oldComment,
+      user: { ...oldComment.user },
+    };
+
+    const posts = data.posts.map((post) => {
+      const newPost = {
+        ...post,
+        comments: [...post.comments, newComment],
+        comments_aggregate: {
+          ...post.comments_aggregate,
+          aggregate: {
+            ...post.comments_aggregate.aggregate,
+            count: post.comments_aggregate.aggregate.count + 1,
+          },
+        },
+      };
+
+      return post.id === postId ? newPost : post;
+    });
+
+    cache.writeQuery({ query: GET_FEED, data: { posts } });
+    setContent("");
+  }
+  function handleAddComment() {
+    const variables = {
+      content,
+      postId,
+      userId: currentId,
+    };
+
+    createComment({ variables, update: handleUpdate });
+  }
   return (
     <div className={classes.commentContainer}>
       <TextField
@@ -171,7 +271,12 @@ function Comment() {
           },
         }}
       />
-      <Button color="primary" className={classes.commentButton} disabled={!content.trim()}>
+      <Button
+        color="primary"
+        className={classes.commentButton}
+        disabled={!content.trim()}
+        onClick={handleAddComment}
+      >
         Post
       </Button>
     </div>

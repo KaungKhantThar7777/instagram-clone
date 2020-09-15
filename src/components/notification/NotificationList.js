@@ -10,6 +10,7 @@ import { CHECK_NOTIFICATIONS } from "../../graphql/mutations";
 import { formatDateToNowShort } from "../../utils/formatDate";
 
 function NotificationList({ handleCloseList, notifications, currentId }) {
+  console.log({ notifications });
   const listContainerRef = React.useRef();
   const classes = useNotificationListStyles();
   const [checkNotifications] = useMutation(CHECK_NOTIFICATIONS);
@@ -31,28 +32,14 @@ function NotificationList({ handleCloseList, notifications, currentId }) {
           <Grid key={notification.id} className={classes.listItem} item>
             <div className={classes.listItemWrapper}>
               <div className={classes.avatarWrapper}>
-                <Avatar
-                  src={notification.user.profile_image}
-                  alt="User avatar"
-                />
+                <Avatar src={notification.user.profile_image} alt="User avatar" />
               </div>
               <div className={classes.nameWrapper}>
-                <Typography variant="body1">
-                  {notification.user.username}
-                </Typography>
-                <Typography
-                  variant="body2"
-                  color="textSecondary"
-                  className={classes.typography}
-                >
-                  {isLike &&
-                    `likes your photo. ${formatDateToNowShort(
-                      notification.created_at
-                    )}`}
+                <Typography variant="body1">{notification.user.username}</Typography>
+                <Typography variant="body2" color="textSecondary" className={classes.typography}>
+                  {isLike && `likes your photo. ${formatDateToNowShort(notification.created_at)}`}
                   {isFollow &&
-                    `started following you. ${formatDateToNowShort(
-                      notification.created_at
-                    )}`}
+                    `started following you. ${formatDateToNowShort(notification.created_at)}`}
                 </Typography>
               </div>
             </div>

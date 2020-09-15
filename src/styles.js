@@ -354,11 +354,9 @@ export const useNavbarStyles = makeStyles((theme) => ({
     zIndex: 1031,
     left: 0,
     height: 3,
-    background:
-      "#27c4f5 linear-gradient(to right,#27c4f5,#a307ba,#fd8d32,#70c050,#27c4f5)",
+    background: "#27c4f5 linear-gradient(to right,#27c4f5,#a307ba,#fd8d32,#70c050,#27c4f5)",
     backgroundSize: "500%",
-    animation:
-      "2s linear infinite $LoadingBarProgress,.5s ease-out $LoadingBarEnter",
+    animation: "2s linear infinite $LoadingBarProgress,.5s ease-out $LoadingBarEnter",
     transformOrigin: "left",
     width: "100%",
   },
@@ -874,12 +872,16 @@ export const useFollowSuggestionsStyles = makeStyles((theme) => ({
       border,
       padding: "20px 33px !important",
       margin: "10px",
+      [theme.breakpoints.down("sm")]: {
+        padding: "20px !important",
+      },
     },
     "& .slick-next:before, & .slick-prev:before": {
       color: "rgb(38, 38, 38)",
       fontSize: "24px !important",
     },
   },
+
   typography: {
     borderBottom: "none !important",
     padding: "0px 0px 0px 12px !important",
